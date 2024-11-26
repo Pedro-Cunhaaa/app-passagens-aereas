@@ -36,22 +36,31 @@ public class Menu {
         }
     }
 
+    /*
+        Todo scanner.nextLine() vai limpar o buffer
+     */
+
     private void iniciarCompra() {
         System.out.println("Informe seus dados para continuar.");
-        System.out.println("Nome:");
-        String nome = scanner.nextLine();
+
+        String nome = obterNomeValido();
 
         System.out.println("Telefone:");
         String telefone = scanner.nextLine();
 
-        System.out.println("CPF ou CNPJ:");
-        String cpfOuCnpj = scanner.nextLine();
+        String cpfOuCnpj = obterCpfOuCnpjValido();
 
         System.out.println("Informe o valor disponível em sua conta (em reais):");
         saldoUsuario = scanner.nextDouble();
-        scanner.nextLine(); // Limpa o buffer
+        scanner.nextLine();
 
         Cliente cliente = new Cliente(nome, telefone, cpfOuCnpj);
+
+        if (cpfOuCnpj.length() == 11) {
+            System.out.println("CPF: " + cpfOuCnpj);
+        } else if (cpfOuCnpj.length() == 14) {
+            System.out.println("CNPJ: " + cpfOuCnpj);
+        }
 
         boolean desejaComprarMais = true;
 
@@ -61,7 +70,7 @@ public class Menu {
 
             System.out.println("Selecione o número do voo desejado:");
             int escolha = scanner.nextInt();
-            scanner.nextLine(); // Limpa o buffer
+            scanner.nextLine();
 
             Passagem passagemEscolhida = vooService.getPassagemPorIndice(escolha - 1);
             if (passagemEscolhida != null) {
@@ -70,10 +79,10 @@ public class Menu {
                     System.out.println("1. Escolher outra passagem");
                     System.out.println("2. Sair");
                     int opcao = scanner.nextInt();
-                    scanner.nextLine(); // Limpa o buffer
+                    scanner.nextLine();
 
                     if (opcao == 2) {
-                        return; // Sai do método iniciarCompra
+                        return;
                     }
                 } else {
                     realizarCompra(cliente, passagemEscolhida);
@@ -82,10 +91,10 @@ public class Menu {
                     System.out.println("1. Sim");
                     System.out.println("2. Não");
                     int opcao = scanner.nextInt();
-                    scanner.nextLine(); // Limpa o buffer
+                    scanner.nextLine();
 
                     if (opcao != 1) {
-                        desejaComprarMais = false; // Finaliza o loop
+                        desejaComprarMais = false;
                     }
                 }
             } else {
@@ -93,6 +102,34 @@ public class Menu {
             }
         }
     }
+
+    private String obterNomeValido() {
+        while (true) {
+            System.out.println("Nome (somente letras):");
+            String nome = scanner.nextLine();
+
+            if (nome.matches("^[a-zA-ZáéíóúÁÉÍÓÚãõçÇâêîôûÂÊÎÔÛ ]+$")) {
+                return nome;
+            } else {
+                System.out.println("Nome inválido. Por favor, insira apenas letras.");
+            }
+        }
+    }
+
+
+    private String obterCpfOuCnpjValido() {
+        while (true) {
+            System.out.println("CPF ou CNPJ:");
+            String cpfOuCnpj = scanner.nextLine();
+
+            if (cpfOuCnpj.length() == 11 || cpfOuCnpj.length() == 14) {
+                return cpfOuCnpj;
+            } else {
+                System.out.println("Digite um CPF ou um CNPJ válido (11 ou 14 dígitos).");
+            }
+        }
+    }
+
 
     private void realizarCompra(Cliente cliente, Passagem passagem) {
         System.out.println("=== Detalhes da Compra ===");
@@ -133,14 +170,14 @@ public class Menu {
             double valorParcela;
 
             if (parcelas >= 1 && parcelas <= 5) {
-                // Sem juros
+                // sem juros
                 valorParcela = valorTotal / parcelas;
                 System.out.printf("Compra parcelada em %d vezes de R$%.2f cada (sem juros).%n", parcelas, valorParcela);
             } else if (parcelas >= 6 && parcelas <= 8) {
-                // Juros de 12.5% por parcela
+                // juros de 12.5% por parcela
                 double juros = 0.125; // 12.5%
-                valorParcela = (valorTotal * Math.pow(1 + juros, parcelas)) / parcelas; // Fórmula para aplicar juros em cada parcela
-                valorTotal = valorParcela * parcelas; // Atualiza o valor total com os juros acumulados
+                valorParcela = (valorTotal * Math.pow(1 + juros, parcelas)) / parcelas;
+                valorTotal = valorParcela * parcelas;
                 System.out.printf("Compra parcelada em %d vezes de R$%.2f cada (com juros de 12.5%% por parcela).%n", parcelas, valorParcela);
             } else {
                 System.out.println("Número de parcelas inválido.");
@@ -167,14 +204,13 @@ public class Menu {
         }
 
         if (pagamentoService.processarPagamento(pagamento)) {
-            saldoUsuario -= passagem.getPreco(); // Abate o valor da passagem do saldo do usuário
-            passagensCompradas.add(passagem); // Armazena a passagem na lista
+            saldoUsuario -= passagem.getPreco();
+            passagensCompradas.add(passagem);
             Reserva reserva = new Reserva("RES-" + System.currentTimeMillis(), cliente, passagem, pagamento);
             System.out.println("Compra realizada com sucesso!");
             System.out.println("Código da Reserva: " + reserva.getCodigoReserva());
             System.out.println("Seu novo saldo é: R$" + saldoUsuario);
 
-            // Salvar resultado final em um arquivo
             salvarResumoCompra(reserva);
         } else {
             System.out.println("Falha no pagamento. Tente novamente.");

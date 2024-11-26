@@ -8,7 +8,6 @@ public class Passagem {
     private String dataHoraChegada;
     private double preco;
 
-    // Construtor com parâmetros
     public Passagem(String codigo, String origem, String destino, String dataHoraPartida, String dataHoraChegada, double preco) {
         this.codigo = codigo;
         this.origem = origem;
@@ -18,7 +17,6 @@ public class Passagem {
         this.preco = preco;
     }
 
-    // Métodos de acesso (getters)
     public String getCodigo() {
         return codigo;
     }
