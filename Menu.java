@@ -238,15 +238,15 @@ public class Menu {
 
     private void salvarResumoCompra(Reserva reserva) {
         try (FileWriter writer = new FileWriter("histórico_compra.txt", true)) {
-            writer.write("--- Resumo da Compra ---\n");
-            writer.write("Código da Reserva: " + reserva.getCodigoReserva() + "\n");
+            writer.write("--- Resumo da compr ---\n");
+            writer.write("Código da reserva: " + reserva.getCodigoReserva() + "\n");
             writer.write("Cliente: " + reserva.getCliente().getNome() + "\n");
             writer.write("Passagem: " + reserva.getPassagem().getOrigem() + " -> " + reserva.getPassagem().getDestino() + "\n");
             writer.write("Preço: R$" + reserva.getPassagem().getPreco() + "\n");
-            writer.write("Data de Partida: " + reserva.getPassagem().getDataHoraPartida() + "\n");
-            writer.write("Data de Chegada: " + reserva.getPassagem().getDataHoraChegada() + "\n");
-            writer.write("Método de Pagamento: " + (reserva.getPagamento() instanceof PagamentoBoleto ? "Boleto" : "Cartão de Crédito") + "\n");
-            writer.write("Total Pago: R$" + reserva.getPagamento().getClass() + "\n");
+            writer.write("Data de partida: " + reserva.getPassagem().getDataHoraPartida() + "\n");
+            writer.write("Data de chegada: " + reserva.getPassagem().getDataHoraChegada() + "\n");
+            writer.write("Método de pagamento: " + (reserva.getPagamento() instanceof PagamentoBoleto ? "Boleto" : "Cartão de Crédito") + "\n");
+            writer.write("Total pago: R$" + reserva.getPagamento().getClass() + "\n");
             writer.write("Saldo após compra: R$" + saldoUsuario + "\n");
             writer.write("---------------------------------\n");
         } catch (IOException e) {
